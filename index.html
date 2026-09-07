@@ -980,12 +980,17 @@ footer{padding:2rem 0;display:flex;justify-content:space-between;align-items:cen
         <a href="https://www.linkedin.com/in/mmalvasan/" target="_blank" class="c-link"><div class="c-icon">in</div>linkedin.com/in/mmalvasan</a>
       </div>
     </div>
-    <div class="cf">
-      <input type="text" placeholder="Your name">
-      <input type="email" placeholder="Your email">
-      <textarea placeholder="Tell me about your website and what you want to improve..."></textarea>
-      <button type="button">Send Message</button>
-    </div>
+    <form class="cf" id="contactForm" action="https://formsubmit.co/mmalvasan@gmail.com" method="POST">
+      <input type="hidden" name="_subject" value="New message from portfolio site">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+      <input type="text" name="name" placeholder="Your name" required>
+      <input type="email" name="email" placeholder="Your email" required>
+      <textarea name="message" placeholder="Tell me about your website and what you want to improve..." required></textarea>
+      <button type="submit" id="cfSubmitBtn">Send Message</button>
+      <p id="cfStatus" style="font-size:12.5px;margin-top:.4rem;display:none"></p>
+    </form>
   </div>
 </section>
 
@@ -1030,6 +1035,45 @@ window.addEventListener('resize',function(){updateLogo();});
 setInterval(function(){logoCurrent=(logoCurrent+1)%logoTotal;updateLogo();},4000);
 
 
+
+// Contact form (FormSubmit AJAX)
+var contactForm = document.getElementById('contactForm');
+if (contactForm) {
+  contactForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn = document.getElementById('cfSubmitBtn');
+    var status = document.getElementById('cfStatus');
+    var originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    status.style.display = 'none';
+
+    fetch(contactForm.action, {
+      method: 'POST',
+      body: new FormData(contactForm),
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(function(response) {
+      if (response.ok) {
+        status.textContent = "Thanks! Your message has been sent. I'll get back to you soon.";
+        status.style.color = '#3a8a5c';
+        status.style.display = 'block';
+        contactForm.reset();
+      } else {
+        throw new Error('Submission failed');
+      }
+    })
+    .catch(function() {
+      status.textContent = "Something went wrong. Please try emailing mmalvasan@gmail.com directly.";
+      status.style.color = '#c0392b';
+      status.style.display = 'block';
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    });
+  });
+}
 
 // FAQ accordion
 function toggleFaq(btn){
